@@ -131,6 +131,52 @@ HP PSC 1000, 1100, 1200, 1300, 1310, 1400, 1500, 1600, 2100, 2150, 2170, 2200, 2
 ### Other / Legacy
 HP 910, HP 915, hp1100, hp1100w, hp1130, hp1210nf, hp1560, hp1600dn
 
+## HP LaserJet 1020 Plus — Special Instructions
+
+**Important:** The HP LaserJet 1020 and 1020 Plus are **NOT supported** by Apple's HewlettPackardPrinterDrivers package. These printers require a different driver solution.
+
+### Why the 1020 Plus is Different
+
+The HP LaserJet 1020/1020 Plus uses the Zenographics ZjStream (ZJS) protocol instead of standard PCL/PostScript. This printer also requires firmware upload via USB on every power-on, which is not supported by Apple's driver package.
+
+### Solution: Use the foo2zjs Driver
+
+For macOS users (including Apple Silicon) with HP LaserJet 1020 or 1020 Plus printers, use the open-source **foo2zjs** driver instead:
+
+**Recommended Solution:**
+- Repository: [https://github.com/FZJ-SDU/hp-laserjet-1020-plus-macos-driver](https://github.com/FZJ-SDU/hp-laserjet-1020-plus-macos-driver)
+- Provides pre-compiled binaries for macOS
+- Works on Apple Silicon (M1/M2/M3/M4) and Intel Macs
+- Supports macOS Sequoia (15.x), Sonoma (14.x), Ventura (13.x), and earlier
+- Includes automatic firmware upload functionality
+
+**Quick Installation:**
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/FZJ-SDU/hp-laserjet-1020-plus-macos-driver.git
+cd hp-laserjet-1020-plus-macos-driver
+
+# 2. Copy files to system directories
+sudo mkdir -p /usr/local/share/foo2zjs/firmware
+sudo cp sihp1020.dl /usr/local/share/foo2zjs/firmware/
+sudo cp gs-static /usr/local/bin/ && sudo chmod +x /usr/local/bin/gs-static
+sudo cp foo2zjs /usr/libexec/cups/filter/ && sudo chmod +x /usr/libexec/cups/filter/foo2zjs
+sudo cp foomatic-rip /usr/libexec/cups/filter/ && sudo chmod +x /usr/libexec/cups/filter/foomatic-rip
+sudo cp HP-LaserJet_1020.ppd /Library/Printers/PPDs/Contents/Resources/
+
+# 3. Restart CUPS
+sudo killall -HUP cupsd
+
+# 4. Add your printer via System Settings → Printers & Scanners
+```
+
+**Alternative (Advanced Users):**
+- Build from source: [OpenPrinting/foo2zjs](https://github.com/OpenPrinting/foo2zjs)
+- Requires Xcode Command Line Tools and package manager (MacPorts/Homebrew)
+
+**Note:** The HP LaserJet 1020 Plus can only connect via USB (no network printing) due to the ZjStream protocol requirements.
+
 ## Notes
 
 - The drivers run under **Rosetta 2** on Apple Silicon. Make sure Rosetta is installed (`softwareupdate --install-rosetta`).
